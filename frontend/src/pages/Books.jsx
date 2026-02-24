@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { bookAPI } from '../services/api';
+import { bookAPI, reservationAPI } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 
 export default function Books() {
+  const { user } = useAuth();
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
@@ -44,21 +46,42 @@ export default function Books() {
     },
   });
 
+  const reserveMutation = useMutation({
+    mutationFn: (book_id) => reservationAPI.create({ book_id }),
+    onSuccess: () => {
+      toast.success('Book reserved successfully! Waiting for admin approval.');
+      queryClient.invalidateQueries(['books']);
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.error || 'Failed to reserve book');
+    },
+  });
+
   const handleSubmit = (e) => {
     e.preventDefault();
     createMutation.mutate(formData);
   };
 
+  const handleReserve = (bookId) => {
+    if (window.confirm('Do you want to reserve this book?')) {
+      reserveMutation.mutate(bookId);
+    }
+  };
+
+  const isAdmin = user?.role === 'admin';
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-3xl font-bold">Books</h2>
-        <button 
-          onClick={() => setShowModal(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          Add Book
-        </button>
+        {isAdmin && (
+          <button 
+            onClick={() => setShowModal(true)}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Add Book
+          </button>
+        )}
       </div>
 
       <input
@@ -81,6 +104,7 @@ export default function Books() {
                 <th className="p-3 text-left">Author</th>
                 <th className="p-3 text-left">Category</th>
                 <th className="p-3 text-left">Available</th>
+                {!isAdmin && <th className="p-3 text-left">Action</th>}
               </tr>
             </thead>
             <tbody>
@@ -97,6 +121,17 @@ export default function Books() {
                       {book.available_copies}/{book.total_copies}
                     </span>
                   </td>
+                  {!isAdmin && (
+                    <td className="p-3">
+                      <button
+                        onClick={() => handleReserve(book.id)}
+                        disabled={book.available_copies === 0 || reserveMutation.isPending}
+                        className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Reserve
+                      </button>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>

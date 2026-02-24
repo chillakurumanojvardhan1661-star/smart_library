@@ -1,4 +1,4 @@
-# 📚 Library Management System v2.0
+# 📚 VIT-AP University Central Library Management System
 
 A modern, full-stack web application for digitizing library operations with intelligent features including AI-based recommendations, advanced analytics, and comprehensive reporting.
 

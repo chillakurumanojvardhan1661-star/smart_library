@@ -10,6 +10,7 @@ import recommendationRoutes from './routes/recommendationRoutes.js';
 import analyticsRoutes from './routes/analyticsRoutes.js';
 import exportRoutes from './routes/exportRoutes.js';
 import fineRoutes from './routes/fineRoutes.js';
+import reservationRoutes from './routes/reservationRoutes.js';
 
 dotenv.config();
 
@@ -36,10 +37,11 @@ app.use('/api/recommendations', recommendationRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/export', exportRoutes);
 app.use('/api/fines', fineRoutes);
+app.use('/api/reservations', reservationRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Library Management System API v2.0' });
+  res.json({ status: 'OK', message: 'VIT-AP University Central Library API' });
 });
 
 app.listen(PORT, () => {

@@ -176,14 +176,20 @@ export const getAllIssues = async (req, res) => {
   try {
     const { status } = req.query;
     let query = `
-      SELECT i.*, b.title, b.author, m.name as member_name, m.member_id
+      SELECT i.*, 
+             b.title, 
+             b.author, 
+             COALESCE(m.name, u.username) as member_name, 
+             COALESCE(m.member_id, CAST(u.id AS TEXT)) as member_id,
+             u.role
       FROM issues i
       JOIN books b ON i.book_id = b.id
-      JOIN members m ON i.member_id = m.id
+      LEFT JOIN members m ON i.member_id = m.id
+      LEFT JOIN users u ON i.user_id = u.id
     `;
     
     if (status) {
-      query += ` WHERE i.status = $1`;
+      query += ` WHERE i.status = ?`;
     }
     
     query += ' ORDER BY i.issue_date DESC';
@@ -201,10 +207,16 @@ export const getAllIssues = async (req, res) => {
 export const getOverdueBooks = async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT i.*, b.title, b.author, m.name as member_name, m.member_id
+      `SELECT i.*, 
+              b.title, 
+              b.author, 
+              COALESCE(m.name, u.username) as member_name, 
+              COALESCE(m.member_id, CAST(u.id AS TEXT)) as member_id,
+              u.role
        FROM issues i
        JOIN books b ON i.book_id = b.id
-       JOIN members m ON i.member_id = m.id
+       LEFT JOIN members m ON i.member_id = m.id
+       LEFT JOIN users u ON i.user_id = u.id
        WHERE i.status = 'issued' AND i.due_date < CURRENT_DATE
        ORDER BY i.due_date`
     );

@@ -8,6 +8,8 @@ import Issues from './pages/Issues';
 import Analytics from './pages/Analytics';
 import Recommendations from './pages/Recommendations';
 import Fines from './pages/Fines';
+import Users from './pages/Users';
+import Reservations from './pages/Reservations';
 import Login from './pages/Login';
 import Register from './pages/Register';
 
@@ -38,14 +40,18 @@ function AppContent() {
       <nav className="bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold">📚 Library Management v2.0</h1>
+            <h1 className="text-2xl font-bold">📚 VIT-AP University Central Library</h1>
             <div className="flex gap-6 items-center">
               <Link to="/" className="hover:text-blue-200 transition">Dashboard</Link>
               <Link to="/books" className="hover:text-blue-200 transition">Books</Link>
+              <Link to="/reservations" className="hover:text-blue-200 transition">
+                {user.role === 'admin' ? 'Reservations' : 'My Reservations'}
+              </Link>
               
               {/* Admin-only navigation */}
               {user.role === 'admin' && (
                 <>
+                  <Link to="/users" className="hover:text-blue-200 transition">Users</Link>
                   <Link to="/members" className="hover:text-blue-200 transition">Members</Link>
                   <Link to="/issues" className="hover:text-blue-200 transition">Issues</Link>
                   <Link to="/fines" className="hover:text-blue-200 transition">Fines</Link>
@@ -85,6 +91,8 @@ function AppContent() {
         <Routes>
           <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/books" element={<ProtectedRoute><Books /></ProtectedRoute>} />
+          <Route path="/reservations" element={<ProtectedRoute><Reservations /></ProtectedRoute>} />
+          <Route path="/users" element={<ProtectedRoute><Users /></ProtectedRoute>} />
           <Route path="/members" element={<ProtectedRoute><Members /></ProtectedRoute>} />
           <Route path="/issues" element={<ProtectedRoute><Issues /></ProtectedRoute>} />
           <Route path="/fines" element={<ProtectedRoute><Fines /></ProtectedRoute>} />

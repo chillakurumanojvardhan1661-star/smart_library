@@ -9,7 +9,14 @@ const router = express.Router();
 router.use(authenticateToken);
 router.use(requireRole('admin'));
 
+// Dashboard stats
 router.get('/stats', adminController.getDashboardStats);
 router.get('/activities', adminController.getRecentActivities);
+
+// User management
+router.get('/users', adminController.getAllUsers);
+router.put('/users/:id/status', adminController.updateUserStatus);
+router.put('/users/:id/role', adminController.updateUserRole);
+router.delete('/users/:id', adminController.deleteUser);
 
 export default router;

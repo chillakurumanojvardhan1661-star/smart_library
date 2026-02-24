@@ -1,5 +1,5 @@
 {
-  "name": "library-management-backend",
+  "name": "vitap-library-backend",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
@@ -7,6 +7,7 @@
     "start": "node src/server.js"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.97.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",

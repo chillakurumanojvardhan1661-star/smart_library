@@ -90,12 +90,14 @@ export default function Issues() {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-3xl font-bold">Issue & Return</h2>
-        <button 
-          onClick={() => setShowIssueModal(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          Issue Book
-        </button>
+        {user?.role === 'admin' && (
+          <button 
+            onClick={() => setShowIssueModal(true)}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Issue Book
+          </button>
+        )}
       </div>
 
       {isLoading ? (

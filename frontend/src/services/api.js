@@ -32,4 +32,13 @@ export const adminAPI = {
   getActivities: () => api.get('/admin/activities'),
 };
 
+export const reservationAPI = {
+  create: (data) => api.post('/reservations', data),
+  getUserReservations: () => api.get('/reservations/my-reservations'),
+  getAllReservations: (params) => api.get('/reservations', { params }),
+  approve: (id) => api.patch(`/reservations/${id}/approve`),
+  reject: (id) => api.patch(`/reservations/${id}/reject`),
+  cancel: (id) => api.patch(`/reservations/${id}/cancel`),
+};
+
 export default api;
