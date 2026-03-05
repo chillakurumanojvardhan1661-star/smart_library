@@ -16,6 +16,7 @@ if (process.env.USE_SQLITE === 'true') {
       let mappedParams = params;
       let sqliteSql = sql;
 
+      // Handle PostgreSQL style parameters ($1, $2, etc.)
       if (paramMatches.length > 0) {
         const usedIndices = paramMatches.map(m => parseInt(m.substring(1)));
 
