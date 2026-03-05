@@ -10,21 +10,21 @@ const { Pool } = pg;
 const connectionString = process.env.POSTGRES_URL || process.env.DATABASE_URL || `postgresql://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`;
 
 const pool = new Pool({
-    connectionString,
-    ssl: {
-        rejectUnauthorized: false
-    }
+  connectionString,
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
 
 async function migrateDatabase() {
-    console.log('🔄 Smaert Library Management - Vercel Postgres Migration Started');
+  console.log('🔄 Smaert Library Management - Vercel Postgres Migration Started');
 
-    const client = await pool.connect();
+  const client = await pool.connect();
 
-    try {
-        // 1. Create Users Table
-        console.log('📝 Creating users table...');
-        await client.query(`
+  try {
+    // 1. Create Users Table
+    console.log('📝 Creating users table...');
+    await client.query(`
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
         username VARCHAR(255) UNIQUE NOT NULL,
@@ -46,9 +46,9 @@ async function migrateDatabase() {
       );
     `);
 
-        // 2. Create Books Table
-        console.log('📝 Creating books table...');
-        await client.query(`
+    // 2. Create Books Table
+    console.log('📝 Creating books table...');
+    await client.query(`
       CREATE TABLE IF NOT EXISTS books (
         id SERIAL PRIMARY KEY,
         isbn VARCHAR(50) UNIQUE NOT NULL,
@@ -60,14 +60,15 @@ async function migrateDatabase() {
         total_copies INTEGER DEFAULT 1,
         available_copies INTEGER DEFAULT 1,
         price DECIMAL(10, 2) DEFAULT 0,
+        cover_image_url VARCHAR(1024),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
 
-        // 3. Create Members Table (Legacy Support)
-        console.log('📝 Creating members table...');
-        await client.query(`
+    // 3. Create Members Table (Legacy Support)
+    console.log('📝 Creating members table...');
+    await client.query(`
       CREATE TABLE IF NOT EXISTS members (
         id SERIAL PRIMARY KEY,
         member_id VARCHAR(100) UNIQUE NOT NULL,
@@ -83,9 +84,9 @@ async function migrateDatabase() {
       );
     `);
 
-        // 4. Create Issues Table
-        console.log('📝 Creating issues table...');
-        await client.query(`
+    // 4. Create Issues Table
+    console.log('📝 Creating issues table...');
+    await client.query(`
       CREATE TABLE IF NOT EXISTS issues (
         id SERIAL PRIMARY KEY,
         book_id INTEGER REFERENCES books(id) ON DELETE CASCADE,
@@ -105,9 +106,9 @@ async function migrateDatabase() {
       );
     `);
 
-        // 5. Create Fines Table
-        console.log('📝 Creating fines table...');
-        await client.query(`
+    // 5. Create Fines Table
+    console.log('📝 Creating fines table...');
+    await client.query(`
       CREATE TABLE IF NOT EXISTS fines (
         id SERIAL PRIMARY KEY,
         issue_id INTEGER REFERENCES issues(id) ON DELETE CASCADE,
@@ -127,9 +128,9 @@ async function migrateDatabase() {
       );
     `);
 
-        // 6. Create Fine Payments Table
-        console.log('📝 Creating fine_payments table...');
-        await client.query(`
+    // 6. Create Fine Payments Table
+    console.log('📝 Creating fine_payments table...');
+    await client.query(`
       CREATE TABLE IF NOT EXISTS fine_payments (
         id SERIAL PRIMARY KEY,
         fine_id INTEGER REFERENCES fines(id) ON DELETE CASCADE,
@@ -144,9 +145,9 @@ async function migrateDatabase() {
       );
     `);
 
-        // 7. Create Roles Table
-        console.log('📝 Creating roles table...');
-        await client.query(`
+    // 7. Create Roles Table
+    console.log('📝 Creating roles table...');
+    await client.query(`
       CREATE TABLE IF NOT EXISTS roles (
         id SERIAL PRIMARY KEY,
         role_name VARCHAR(50) UNIQUE NOT NULL,
@@ -161,9 +162,9 @@ async function migrateDatabase() {
       );
     `);
 
-        // 8. Create Reservations Table
-        console.log('📝 Creating reservations table...');
-        await client.query(`
+    // 8. Create Reservations Table
+    console.log('📝 Creating reservations table...');
+    await client.query(`
       CREATE TABLE IF NOT EXISTS reservations (
         id SERIAL PRIMARY KEY,
         book_id INTEGER REFERENCES books(id) ON DELETE CASCADE,
@@ -176,9 +177,9 @@ async function migrateDatabase() {
       );
     `);
 
-        // 9. Create Book Requests Table
-        console.log('📝 Creating book_requests table...');
-        await client.query(`
+    // 9. Create Book Requests Table
+    console.log('📝 Creating book_requests table...');
+    await client.query(`
       CREATE TABLE IF NOT EXISTS book_requests (
         id SERIAL PRIMARY KEY,
         user_id INTEGER REFERENCES users(id),
@@ -193,9 +194,9 @@ async function migrateDatabase() {
       );
     `);
 
-        // Insert Default Roles
-        console.log('🔑 Inserting default roles...');
-        await client.query(`
+    // Insert Default Roles
+    console.log('🔑 Inserting default roles...');
+    await client.query(`
       INSERT INTO roles (role_name, description, max_books, due_days, fine_rate, grace_days, max_fine_cap, fine_limit_for_suspension) 
       VALUES 
         ('admin', 'Full system access', 999, 365, 0.00, 0, 0.00, 0.00),
@@ -205,27 +206,27 @@ async function migrateDatabase() {
       ON CONFLICT (role_name) DO NOTHING;
     `);
 
-        // Create Initial Admin User
-        const adminCheck = await client.query("SELECT id FROM users WHERE email = 'admin@library.com'");
-        if (adminCheck.rows.length === 0) {
-            console.log('👨‍💼 Creating default admin user...');
-            const passwordHash = await bcrypt.hash('admin123', 10);
-            await client.query(
-                "INSERT INTO users (username, email, password_hash, role, status, department) VALUES ($1, $2, $3, $4, $5, $6)",
-                ['admin', 'admin@library.com', passwordHash, 'admin', 'active', 'Administration']
-            );
-        } else {
-            console.log('ℹ️ Default admin already exists.');
-        }
-
-        console.log('✅✅✅ Migration Completed Successfully!');
-
-    } catch (err) {
-        console.error('❌ Migration Failed:', err);
-    } finally {
-        client.release();
-        pool.end();
+    // Create Initial Admin User
+    const adminCheck = await client.query("SELECT id FROM users WHERE email = 'admin@library.com'");
+    if (adminCheck.rows.length === 0) {
+      console.log('👨‍💼 Creating default admin user...');
+      const passwordHash = await bcrypt.hash('admin123', 10);
+      await client.query(
+        "INSERT INTO users (username, email, password_hash, role, status, department) VALUES ($1, $2, $3, $4, $5, $6)",
+        ['admin', 'admin@library.com', passwordHash, 'admin', 'active', 'Administration']
+      );
+    } else {
+      console.log('ℹ️ Default admin already exists.');
     }
+
+    console.log('✅✅✅ Migration Completed Successfully!');
+
+  } catch (err) {
+    console.error('❌ Migration Failed:', err);
+  } finally {
+    client.release();
+    pool.end();
+  }
 }
 
 migrateDatabase();

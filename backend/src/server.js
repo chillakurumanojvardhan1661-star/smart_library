@@ -27,6 +27,8 @@ if (process.env.USE_SQLITE === 'true') {
 app.use(cors());
 app.use(express.json());
 
+import uploadRoutes from './routes/uploadRoutes.js';
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/books', bookRoutes);
@@ -38,6 +40,7 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/export', exportRoutes);
 app.use('/api/fines', fineRoutes);
 app.use('/api/reservations', reservationRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // Health check
 app.get('/health', (req, res) => {

@@ -57,4 +57,16 @@ export const fineAPI = {
   bulkWaive: (data) => api.post('/fines/bulk/waive', data),
 };
 
+export const uploadAPI = {
+  uploadFile: (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post('/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  },
+};
+
 export default api;

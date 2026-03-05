@@ -25,6 +25,7 @@ export const initDatabase = async () => {
       total_copies INTEGER DEFAULT 1,
       available_copies INTEGER DEFAULT 1,
       price DECIMAL(10, 2) DEFAULT 0,
+      cover_image_url TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
