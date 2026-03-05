@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: import.meta.env.VITE_API_URL || '/api',
 });
 
 export const bookAPI = {
@@ -39,6 +39,22 @@ export const reservationAPI = {
   approve: (id) => api.patch(`/reservations/${id}/approve`),
   reject: (id) => api.patch(`/reservations/${id}/reject`),
   cancel: (id) => api.patch(`/reservations/${id}/cancel`),
+};
+
+export const fineAPI = {
+  getAll: () => api.get('/fines'),
+  getStats: () => api.get('/fines/stats'),
+  getMyBalance: () => api.get('/fines/my-balance'),
+  getMyFines: () => api.get('/fines/my-fines'),
+  getById: (id) => api.get(`/fines/${id}`),
+  getDetails: (id) => api.get(`/fines/${id}/details`),
+  recordPayment: (id, data) => api.post(`/fines/${id}/payment`, data),
+  waive: (id, data) => api.post(`/fines/${id}/waive`, data),
+  createManual: (data) => api.post('/fines/manual', data),
+  updateAmount: (id, data) => api.patch(`/fines/${id}/amount`, data),
+  updateStatus: (id, data) => api.patch(`/fines/${id}/status`, data),
+  deleteFine: (id) => api.delete(`/fines/${id}`),
+  bulkWaive: (data) => api.post('/fines/bulk/waive', data),
 };
 
 export default api;

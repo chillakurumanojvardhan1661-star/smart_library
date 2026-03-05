@@ -4,7 +4,10 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon src/server.js",
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "calculate-fines": "node scripts/auto-calculate-fines.js",
+    "fix-fines-schema": "node scripts/fix-fines-schema.js",
+    "migrate": "node scripts/migrate-vercel-pg.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.97.0",

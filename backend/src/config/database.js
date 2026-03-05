@@ -5,12 +5,14 @@ dotenv.config();
 
 const { Pool } = pg;
 
+// Vercel Postgres automatically injects POSTGRES_URL
+const connectionString = process.env.POSTGRES_URL || process.env.DATABASE_URL || `postgresql://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`;
+
 const pool = new Pool({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  database: process.env.DB_NAME,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
+  connectionString,
+  ssl: {
+    rejectUnauthorized: false // Required for Vercel Postgres connections
+  }
 });
 
 pool.on('connect', () => {
