@@ -12,25 +12,50 @@ import Users from './pages/Users';
 import Reservations from './pages/Reservations';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import PendingApproval from './pages/PendingApproval';
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
-  
+
   if (loading) return <div>Loading...</div>;
   if (!user) return <Navigate to="/login" />;
-  
+
+  // Check if user is pending approval
+  if (user.status === 'pending') {
+    return <Navigate to="/pending-approval" />;
+  }
+
   return children;
 }
 
 function AppContent() {
-  const { user, logout } = useAuth();
+  const { user, logout, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   if (!user) {
     return (
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/pending-approval" element={<PendingApproval />} />
         <Route path="*" element={<Navigate to="/login" />} />
+      </Routes>
+    );
+  }
+
+  // Redirect pending users to approval page
+  if (user.status === 'pending') {
+    return (
+      <Routes>
+        <Route path="/pending-approval" element={<PendingApproval />} />
+        <Route path="*" element={<Navigate to="/pending-approval" />} />
       </Routes>
     );
   }
@@ -47,7 +72,7 @@ function AppContent() {
               <Link to="/reservations" className="hover:text-blue-200 transition">
                 {user.role === 'admin' ? 'Reservations' : 'My Reservations'}
               </Link>
-              
+
               {/* Admin-only navigation */}
               {user.role === 'admin' && (
                 <>
@@ -57,19 +82,19 @@ function AppContent() {
                   <Link to="/fines" className="hover:text-blue-200 transition">Fines</Link>
                 </>
               )}
-              
+
               {/* Non-admin users can see their fine balance */}
               {user.role !== 'admin' && (
                 <Link to="/fines" className="hover:text-blue-200 transition">My Fines</Link>
               )}
-              
+
               <Link to="/recommendations" className="hover:text-blue-200 transition">Recommendations</Link>
-              
+
               {/* Analytics for admin and faculty */}
               {(user.role === 'admin' || user.role === 'faculty') && (
                 <Link to="/analytics" className="hover:text-blue-200 transition">Analytics</Link>
               )}
-              
+
               <div className="flex items-center gap-3 ml-4 pl-4 border-l border-white/30">
                 <div className="text-sm">
                   <div className="font-semibold">{user.username}</div>
@@ -86,7 +111,7 @@ function AppContent() {
           </div>
         </div>
       </nav>
-      
+
       <main className="container mx-auto px-4 py-8">
         <Routes>
           <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />

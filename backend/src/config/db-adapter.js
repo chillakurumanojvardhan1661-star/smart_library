@@ -3,25 +3,23 @@ dotenv.config();
 
 let dbInstance;
 
-if (process.env.USE_SQLITE === 'true') {
+// ALWAYS prioritize PostgreSQL if the URL is present (Vercel Production)
+if (process.env.POSTGRES_URL || process.env.DATABASE_URL) {
+  console.log('🐘 Production Environment detected: Using PostgreSQL');
+  const pgModule = await import('./database.js');
+  dbInstance = pgModule.default;
+} else if (process.env.USE_SQLITE === 'true') {
+  console.log('📦 Development Environment detected: Using SQLite');
   const { getDb } = await import('./database-sqlite.js');
   dbInstance = {
     query: async (sql, params = []) => {
       const db = getDb();
-
-      // If the same parameter index is used multiple times (e.g., $7, $7),
-      // we need to make sure the SQLite ? parameters match the count and values.
       const paramMatches = sql.match(/\$(\d+)/g) || [];
-
       let mappedParams = params;
       let sqliteSql = sql;
 
-      // Handle PostgreSQL style parameters ($1, $2, etc.)
       if (paramMatches.length > 0) {
         const usedIndices = paramMatches.map(m => parseInt(m.substring(1)));
-
-        // Transform PostgreSQL $1, $2 to SQLite ?
-        // If the original SQL has $1, $1, we need to duplicate the first param in the new array
         mappedParams = usedIndices.map(index => params[index - 1]);
         sqliteSql = sql.replace(/\$(\d+)/g, '?');
       }
@@ -40,6 +38,8 @@ if (process.env.USE_SQLITE === 'true') {
     }),
   };
 } else {
+  // Default to PostgreSQL just in case, or show error
+  console.log('🐘 No DB environment set, defaulting to PostgreSQL');
   const pgModule = await import('./database.js');
   dbInstance = pgModule.default;
 }

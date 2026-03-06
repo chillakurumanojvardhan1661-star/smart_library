@@ -170,12 +170,64 @@ export const getProfile = async (req, res) => {
 export const getAllUsers = async (req, res) => {
   try {
     const result = await pool.query(
-      'SELECT id, username, email, role, department, status FROM users WHERE status = ? ORDER BY username',
-      ['active']
+      'SELECT id, username, email, role, department, status, employee_id, student_id, phone, created_at FROM users ORDER BY created_at DESC'
     );
     
     res.json(result.rows);
   } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Approve user account
+export const approveUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    await pool.query(
+      'UPDATE users SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+      ['active', id]
+    );
+    
+    res.json({ message: 'User approved successfully' });
+  } catch (error) {
+    console.error('Approve user error:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Reject user account
+export const rejectUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;
+    
+    await pool.query(
+      'UPDATE users SET status = ?, rejection_reason = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+      ['rejected', reason, id]
+    );
+    
+    res.json({ message: 'User rejected successfully' });
+  } catch (error) {
+    console.error('Reject user error:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Suspend user account
+export const suspendUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;
+    
+    await pool.query(
+      'UPDATE users SET status = ?, suspension_reason = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+      ['suspended', reason, id]
+    );
+    
+    res.json({ message: 'User suspended successfully' });
+  } catch (error) {
+    console.error('Suspend user error:', error);
     res.status(500).json({ error: error.message });
   }
 };

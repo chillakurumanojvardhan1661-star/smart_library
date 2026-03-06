@@ -3,7 +3,7 @@ import pool from '../config/db-adapter.js';
 export const getIssuesTrend = async (req, res) => {
   try {
     const { days = 30 } = req.query;
-    
+
     const result = await pool.query(
       `SELECT date(issue_date) as date, COUNT(*) as count
        FROM issues
@@ -12,7 +12,7 @@ export const getIssuesTrend = async (req, res) => {
        ORDER BY date`,
       [days]
     );
-    
+
     res.json(result.rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -27,7 +27,7 @@ export const getCategoryDistribution = async (req, res) => {
        GROUP BY category
        ORDER BY count DESC`
     );
-    
+
     res.json(result.rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -37,14 +37,15 @@ export const getCategoryDistribution = async (req, res) => {
 export const getTopBorrowers = async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT m.name, m.member_id, COUNT(i.id) as borrow_count
-       FROM members m
-       LEFT JOIN issues i ON m.id = i.member_id
-       GROUP BY m.id
+      `SELECT u.username as name, u.id as member_id, COUNT(i.id) as borrow_count
+       FROM users u
+       LEFT JOIN issues i ON u.id = i.user_id
+       WHERE u.role != 'admin'
+       GROUP BY u.id
        ORDER BY borrow_count DESC
        LIMIT 10`
     );
-    
+
     res.json(result.rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -62,7 +63,7 @@ export const getFineAnalytics = async (req, res) => {
        FROM issues
        WHERE fine_amount > 0`
     );
-    
+
     res.json(result.rows[0]);
   } catch (error) {
     res.status(500).json({ error: error.message });

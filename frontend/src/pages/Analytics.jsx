@@ -5,25 +5,41 @@ import api from '../services/api';
 const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'];
 
 export default function Analytics() {
-  const { data: issuesTrend } = useQuery({
+  const { data: issuesTrend, isLoading: loadingTrend, error: errorTrend } = useQuery({
     queryKey: ['issuesTrend'],
     queryFn: () => api.get('/analytics/issues-trend?days=30').then(res => res.data),
   });
 
-  const { data: categoryDist } = useQuery({
+  const { data: categoryDist, isLoading: loadingDist, error: errorDist } = useQuery({
     queryKey: ['categoryDist'],
     queryFn: () => api.get('/analytics/category-distribution').then(res => res.data),
   });
 
-  const { data: topBorrowers } = useQuery({
+  const { data: topBorrowers, isLoading: loadingTop, error: errorTop } = useQuery({
     queryKey: ['topBorrowers'],
     queryFn: () => api.get('/analytics/top-borrowers').then(res => res.data),
   });
 
-  const { data: fineAnalytics } = useQuery({
+  const { data: fineAnalytics, isLoading: loadingFines, error: errorFines } = useQuery({
     queryKey: ['fineAnalytics'],
     queryFn: () => api.get('/analytics/fines').then(res => res.data),
   });
+
+  if (loadingTrend || loadingDist || loadingTop || loadingFines) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (errorTrend || errorDist || errorTop || errorFines) {
+    return (
+      <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg">
+        Error loading analytics data. Please try again later.
+      </div>
+    );
+  }
 
   return (
     <div>

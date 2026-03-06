@@ -59,7 +59,7 @@ export default function Issues() {
       queryClient.invalidateQueries(['books']);
       queryClient.invalidateQueries(['fines']);
       queryClient.invalidateQueries(['fine-stats']);
-      
+
       const data = response.data;
       if (data.fine_amount > 0) {
         toast.success(
@@ -91,7 +91,7 @@ export default function Issues() {
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-3xl font-bold">Issue & Return</h2>
         {user?.role === 'admin' && (
-          <button 
+          <button
             onClick={() => setShowIssueModal(true)}
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
           >
@@ -124,9 +124,8 @@ export default function Issues() {
                   <td className="p-3">{new Date(issue.issue_date).toLocaleDateString()}</td>
                   <td className="p-3">{new Date(issue.due_date).toLocaleDateString()}</td>
                   <td className="p-3">
-                    <span className={`px-2 py-1 rounded text-sm ${
-                      issue.status === 'issued' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'
-                    }`}>
+                    <span className={`px-2 py-1 rounded text-sm ${issue.status === 'issued' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'
+                      }`}>
                       {issue.status}
                     </span>
                   </td>
@@ -158,7 +157,7 @@ export default function Issues() {
                 <label className="block text-sm font-medium mb-1">Select Book</label>
                 <select
                   value={issueForm.book_id}
-                  onChange={(e) => setIssueForm({...issueForm, book_id: e.target.value})}
+                  onChange={(e) => setIssueForm({ ...issueForm, book_id: e.target.value })}
                   className="w-full p-2 border rounded"
                   required
                 >
@@ -171,14 +170,17 @@ export default function Issues() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Select User (for fine calculation)</label>
+                <label className="block text-sm font-medium mb-1">Select Member</label>
                 <select
                   value={issueForm.user_id}
-                  onChange={(e) => setIssueForm({...issueForm, user_id: e.target.value})}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setIssueForm({ ...issueForm, user_id: val, member_id: val });
+                  }}
                   className="w-full p-2 border rounded"
                   required
                 >
-                  <option value="">Choose a user...</option>
+                  <option value="">Choose a member...</option>
                   {users?.map((u) => (
                     <option key={u.id} value={u.id}>
                       {u.username} ({u.role}) - {u.email}
@@ -186,24 +188,8 @@ export default function Issues() {
                   ))}
                 </select>
                 <p className="text-xs text-gray-500 mt-1">
-                  Due date will be calculated based on user's role
+                  Due date and limits will be calculated based on user's role
                 </p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Select Member</label>
-                <select
-                  value={issueForm.member_id}
-                  onChange={(e) => setIssueForm({...issueForm, member_id: e.target.value})}
-                  className="w-full p-2 border rounded"
-                  required
-                >
-                  <option value="">Choose a member...</option>
-                  {members?.map((member) => (
-                    <option key={member.id} value={member.id}>
-                      {member.name} ({member.member_id})
-                    </option>
-                  ))}
-                </select>
               </div>
               <div className="bg-blue-50 p-3 rounded text-sm">
                 <p className="font-semibold text-blue-800 mb-1">Fine Rates:</p>

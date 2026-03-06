@@ -1,6 +1,8 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import bookRoutes from './routes/bookRoutes.js';
 import memberRoutes from './routes/memberRoutes.js';
 import issueRoutes from './routes/issueRoutes.js';
@@ -12,7 +14,7 @@ import exportRoutes from './routes/exportRoutes.js';
 import fineRoutes from './routes/fineRoutes.js';
 import reservationRoutes from './routes/reservationRoutes.js';
 
-dotenv.config();
+// dotenv already initialized at top
 
 const app = express();
 const PORT = process.env.PORT || 5000;
