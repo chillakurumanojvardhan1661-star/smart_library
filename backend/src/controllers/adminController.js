@@ -145,24 +145,25 @@ export const updateSettings = async (req, res) => {
 
     // Update specific role limits
     if (studentLimit !== undefined) {
-      await pool.query('UPDATE roles SET max_books = ? WHERE role_name = ?', [studentLimit, 'student']);
+      await pool.query('UPDATE roles SET max_books = $1 WHERE role_name = $2', [studentLimit, 'student']);
     }
     if (facultyLimit !== undefined) {
-      await pool.query('UPDATE roles SET max_books = ? WHERE role_name = ?', [facultyLimit, 'faculty']);
+      await pool.query('UPDATE roles SET max_books = $1 WHERE role_name = $2', [facultyLimit, 'faculty']);
     }
     if (staffLimit !== undefined) {
-      await pool.query('UPDATE roles SET max_books = ? WHERE role_name = ?', [staffLimit, 'staff']);
+      await pool.query('UPDATE roles SET max_books = $1 WHERE role_name = $2', [staffLimit, 'staff']);
     }
 
     // Update global limits (apply to all roles uniformly to match the UI behavior)
     if (loanPeriod !== undefined || finePerDay !== undefined || maxFine !== undefined || gracePeriod !== undefined) {
       const updates = [];
       const params = [];
+      let index = 1;
 
-      if (loanPeriod !== undefined) { updates.push('due_days = ?'); params.push(loanPeriod); }
-      if (finePerDay !== undefined) { updates.push('fine_rate = ?'); params.push(finePerDay); }
-      if (maxFine !== undefined) { updates.push('max_fine_cap = ?'); params.push(maxFine); }
-      if (gracePeriod !== undefined) { updates.push('grace_days = ?'); params.push(gracePeriod ? 1 : 0); }
+      if (loanPeriod !== undefined) { updates.push(`due_days = $${index++}`); params.push(loanPeriod); }
+      if (finePerDay !== undefined) { updates.push(`fine_rate = $${index++}`); params.push(finePerDay); }
+      if (maxFine !== undefined) { updates.push(`max_fine_cap = $${index++}`); params.push(maxFine); }
+      if (gracePeriod !== undefined) { updates.push(`grace_days = $${index++}`); params.push(gracePeriod ? 1 : 0); }
 
       const sql = `UPDATE roles SET ${updates.join(', ')}`;
       await pool.query(sql, params);
