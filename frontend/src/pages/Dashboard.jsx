@@ -13,7 +13,10 @@ export default function Dashboard() {
   });
 
   const handleExport = (type) => {
-    window.open(`http://localhost:5001/api/export/${type}?format=csv`, '_blank');
+    const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+    // Remove /api from the end if it exists, since the export route is /api/export
+    const cleanBaseUrl = baseUrl.replace(/\/api$/, '');
+    window.open(`${cleanBaseUrl}/api/export/${type}?format=csv`, '_blank');
   };
 
   if (isLoading && user?.role === 'admin') {
@@ -27,7 +30,7 @@ export default function Dashboard() {
           <h2 className="text-3xl font-bold">Dashboard</h2>
           <p className="text-gray-600 mt-1">Welcome, {user?.username}! ({user?.role})</p>
         </div>
-        
+
         {user?.role === 'admin' && (
           <div className="flex gap-2">
             <button
@@ -54,7 +57,7 @@ export default function Dashboard() {
           </div>
         )}
       </div>
-      
+
       {user?.role === 'admin' && stats && (
         <>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -78,27 +81,27 @@ export default function Dashboard() {
           <div className="bg-white p-8 rounded-xl shadow-lg">
             <h3 className="text-2xl font-semibold mb-4">Your Borrowing Privileges</h3>
             <div className="space-y-4">
-              <PrivilegeItem 
-                label="Maximum Books" 
-                value={user.role === 'faculty' ? '10 books' : '5 books'} 
+              <PrivilegeItem
+                label="Maximum Books"
+                value={user.role === 'faculty' ? '10 books' : '5 books'}
               />
-              <PrivilegeItem 
-                label="Borrowing Period" 
+              <PrivilegeItem
+                label="Borrowing Period"
                 value={
-                  user.role === 'faculty' ? '30 days' : 
-                  user.role === 'student' ? '14 days' : '21 days'
-                } 
+                  user.role === 'faculty' ? '30 days' :
+                    user.role === 'student' ? '14 days' : '21 days'
+                }
               />
-              <PrivilegeItem 
-                label="Fine Rate" 
+              <PrivilegeItem
+                label="Fine Rate"
                 value={
-                  user.role === 'faculty' ? '$3/day' : 
-                  user.role === 'student' ? '$5/day' : '$4/day'
-                } 
+                  user.role === 'faculty' ? '$3/day' :
+                    user.role === 'student' ? '$5/day' : '$4/day'
+                }
               />
-              <PrivilegeItem 
-                label="Department" 
-                value={user.department || 'Not specified'} 
+              <PrivilegeItem
+                label="Department"
+                value={user.department || 'Not specified'}
               />
             </div>
           </div>
@@ -141,7 +144,7 @@ function StatCard({ title, value, icon, color }) {
 }
 
 function QuickStats({ stats }) {
-  const utilizationRate = stats?.total_copies > 0 
+  const utilizationRate = stats?.total_copies > 0
     ? ((stats.total_copies - stats.available_copies) / stats.total_copies * 100).toFixed(1)
     : 0;
 
@@ -154,7 +157,7 @@ function QuickStats({ stats }) {
           <span className="font-semibold text-lg">{utilizationRate}%</span>
         </div>
         <div className="w-full bg-gray-200 rounded-full h-3">
-          <div 
+          <div
             className="bg-blue-600 h-3 rounded-full transition-all"
             style={{ width: `${utilizationRate}%` }}
           />
