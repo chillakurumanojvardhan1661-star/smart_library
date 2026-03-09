@@ -25,7 +25,7 @@ export const createReservation = async (req, res) => {
     // Create reservation
     const result = await pool.query(
       `INSERT INTO reservations (book_id, user_id, status, reservation_date) 
-       VALUES (?, ?, 'pending', DATE('now'))`,
+       VALUES (?, ?, 'pending', CURRENT_DATE) RETURNING id`,
       [book_id, user_id]
     );
 
@@ -123,11 +123,15 @@ export const approveReservation = async (req, res) => {
     const roleResult = await pool.query('SELECT due_days FROM roles WHERE role_name = ?', [reservation.role]);
     const dueDays = roleResult.rows.length > 0 ? roleResult.rows[0].due_days : 14;
 
+    const dueDate = new Date();
+    dueDate.setDate(dueDate.getDate() + dueDays);
+    const dueDateStr = dueDate.toISOString().split('T')[0];
+
     // Create issue record (member_id can be NULL, we use user_id)
     await pool.query(
       `INSERT INTO issues (book_id, member_id, user_id, issue_date, due_date, status)
-       VALUES (?, NULL, ?, DATE('now'), DATE('now', '+${dueDays} days'), 'issued')`,
-      [reservation.book_id, reservation.user_id]
+       VALUES (?, NULL, ?, CURRENT_DATE, ?, 'issued')`,
+      [reservation.book_id, reservation.user_id, dueDateStr]
     );
 
     // Update book available copies

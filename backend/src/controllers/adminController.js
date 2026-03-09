@@ -9,7 +9,7 @@ export const getAllUsers = async (req, res) => {
        FROM users 
        ORDER BY created_at DESC`
     );
-    
+
     res.json(result.rows);
   } catch (error) {
     console.error('Get all users error:', error);
@@ -23,11 +23,11 @@ export const updateUserStatus = async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
     const adminId = req.user.id;
-    
+
     if (!['active', 'pending', 'suspended', 'rejected'].includes(status)) {
       return res.status(400).json({ error: 'Invalid status' });
     }
-    
+
     await pool.query(
       `UPDATE users 
        SET status = ?, 
@@ -36,7 +36,7 @@ export const updateUserStatus = async (req, res) => {
        WHERE id = ?`,
       [status, adminId, id]
     );
-    
+
     res.json({ message: 'User status updated successfully' });
   } catch (error) {
     console.error('Update user status error:', error);
@@ -49,16 +49,16 @@ export const updateUserRole = async (req, res) => {
   try {
     const { id } = req.params;
     const { role } = req.body;
-    
+
     if (!['admin', 'faculty', 'student', 'staff'].includes(role)) {
       return res.status(400).json({ error: 'Invalid role' });
     }
-    
+
     await pool.query(
       'UPDATE users SET role = ? WHERE id = ?',
       [role, id]
     );
-    
+
     res.json({ message: 'User role updated successfully' });
   } catch (error) {
     console.error('Update user role error:', error);
@@ -70,23 +70,23 @@ export const updateUserRole = async (req, res) => {
 export const deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     // Check if user is admin
     const userResult = await pool.query(
       'SELECT role FROM users WHERE id = ?',
       [id]
     );
-    
+
     if (userResult.rows.length === 0) {
       return res.status(404).json({ error: 'User not found' });
     }
-    
+
     if (userResult.rows[0].role === 'admin') {
       return res.status(403).json({ error: 'Cannot delete admin users' });
     }
-    
+
     await pool.query('DELETE FROM users WHERE id = ?', [id]);
-    
+
     res.json({ message: 'User deleted successfully' });
   } catch (error) {
     console.error('Delete user error:', error);
@@ -106,7 +106,7 @@ export const getDashboardStats = async (req, res) => {
         (SELECT COUNT(*) FROM issues WHERE status = 'issued' AND due_date < CURRENT_DATE) as overdue_books,
         (SELECT COALESCE(SUM(fine_amount), 0) FROM issues WHERE status = 'returned') as total_fines_collected
     `);
-    
+
     res.json(stats.rows[0]);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -123,9 +123,54 @@ export const getRecentActivities = async (req, res) => {
       ORDER BY i.created_at DESC
       LIMIT 10
     `);
-    
+
     res.json(result.rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+};
+
+export const getSettings = async (req, res) => {
+  try {
+    const result = await pool.query('SELECT role_name, max_books, due_days, fine_rate, grace_days, max_fine_cap FROM roles');
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const updateSettings = async (req, res) => {
+  try {
+    const { studentLimit, facultyLimit, staffLimit, loanPeriod, finePerDay, maxFine, gracePeriod } = req.body;
+
+    // Update specific role limits
+    if (studentLimit !== undefined) {
+      await pool.query('UPDATE roles SET max_books = ? WHERE role_name = ?', [studentLimit, 'student']);
+    }
+    if (facultyLimit !== undefined) {
+      await pool.query('UPDATE roles SET max_books = ? WHERE role_name = ?', [facultyLimit, 'faculty']);
+    }
+    if (staffLimit !== undefined) {
+      await pool.query('UPDATE roles SET max_books = ? WHERE role_name = ?', [staffLimit, 'staff']);
+    }
+
+    // Update global limits (apply to all roles uniformly to match the UI behavior)
+    if (loanPeriod !== undefined || finePerDay !== undefined || maxFine !== undefined || gracePeriod !== undefined) {
+      const updates = [];
+      const params = [];
+
+      if (loanPeriod !== undefined) { updates.push('due_days = ?'); params.push(loanPeriod); }
+      if (finePerDay !== undefined) { updates.push('fine_rate = ?'); params.push(finePerDay); }
+      if (maxFine !== undefined) { updates.push('max_fine_cap = ?'); params.push(maxFine); }
+      if (gracePeriod !== undefined) { updates.push('grace_days = ?'); params.push(gracePeriod ? 1 : 0); }
+
+      const sql = `UPDATE roles SET ${updates.join(', ')}`;
+      await pool.query(sql, params);
+    }
+
+    res.json({ message: 'Settings updated successfully' });
+  } catch (error) {
+    console.error('Update settings error:', error);
+    res.status(500).json({ error: 'Failed to update settings' });
   }
 };

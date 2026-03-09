@@ -123,6 +123,7 @@ async function migrateDatabase() {
         waived_by INTEGER REFERENCES users(id),
         waived_reason TEXT,
         waived_at TIMESTAMP,
+        notes TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );

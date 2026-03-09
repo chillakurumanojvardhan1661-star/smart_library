@@ -276,9 +276,13 @@ export const getFineStats = async (req, res) => {
 
     let dateFilter = '';
     if (period === 'month') {
-      dateFilter = "AND created_at >= date('now', '-30 days')";
+      const d = new Date();
+      d.setDate(d.getDate() - 30);
+      dateFilter = `AND created_at >= '${d.toISOString().split('T')[0]}'`;
     } else if (period === 'year') {
-      dateFilter = "AND created_at >= date('now', '-365 days')";
+      const d = new Date();
+      d.setDate(d.getDate() - 365);
+      dateFilter = `AND created_at >= '${d.toISOString().split('T')[0]}'`;
     }
 
     // Get all stats in one query for efficiency
@@ -407,12 +411,12 @@ export const createManualFine = async (req, res) => {
     // Create fine
     const result = await pool.query(
       `INSERT INTO fines (user_id, member_id, fine_amount, fine_type, fine_status, notes)
-       VALUES (?, ?, ?, ?, 'unpaid', ?)`,
+       VALUES (?, ?, ?, ?, 'unpaid', ?) RETURNING id`,
       [targetUserId, member_id, fine_amount, fine_type, notes]
     );
 
-    // Get the ID for the response (lastID is for SQLite)
-    const fineId = result.lastID;
+    // Get the ID for the response
+    const fineId = result.rows[0].id;
 
     // Update balance
     if (targetUserId) {

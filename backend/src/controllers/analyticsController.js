@@ -4,13 +4,17 @@ export const getIssuesTrend = async (req, res) => {
   try {
     const { days = 30 } = req.query;
 
+    const pastDate = new Date();
+    pastDate.setDate(pastDate.getDate() - parseInt(days));
+    const dateStr = pastDate.toISOString().split('T')[0];
+
     const result = await pool.query(
-      `SELECT date(issue_date) as date, COUNT(*) as count
+      `SELECT CAST(issue_date AS DATE) as date, COUNT(*) as count
        FROM issues
-       WHERE issue_date >= date('now', '-' || ? || ' days')
-       GROUP BY date(issue_date)
+       WHERE issue_date >= $1
+       GROUP BY CAST(issue_date AS DATE)
        ORDER BY date`,
-      [days]
+      [dateStr]
     );
 
     res.json(result.rows);

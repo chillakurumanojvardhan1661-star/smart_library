@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fineAPI } from '../services/api';
+import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 
@@ -73,6 +74,13 @@ export default function Fines() {
     queryKey: ['my-balance'],
     queryFn: () => fineAPI.getMyBalance().then(res => res.data),
     enabled: !isAdmin,
+  });
+
+  // Fetch all users for manual fine dropdown
+  const { data: allUsers } = useQuery({
+    queryKey: ['admin-users-list'],
+    queryFn: () => api.get('/admin/users').then(res => res.data),
+    enabled: isAdmin,
   });
 
   // Mutations
@@ -340,8 +348,20 @@ export default function Fines() {
         <Modal title="Create Manual Fine" onClose={() => setShowManualModal(false)}>
           <form onSubmit={(e) => { e.preventDefault(); createManualMutation.mutate(manualData); }} className="space-y-4">
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">User ID (or Username/Email)</label>
-              <input type="text" className="w-full p-3 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-purple-500" required value={manualData.user_id} onChange={e => setManualData({ ...manualData, user_id: e.target.value })} />
+              <label className="block text-sm font-bold text-gray-700 mb-1">Select User</label>
+              <select
+                className="w-full p-3 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-purple-500"
+                required
+                value={manualData.user_id}
+                onChange={e => setManualData({ ...manualData, user_id: e.target.value })}
+              >
+                <option value="">-- Select User --</option>
+                {allUsers?.map(u => (
+                  <option key={u.id} value={u.id}>
+                    {u.username} ({u.email}) - {u.role.toUpperCase()}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>

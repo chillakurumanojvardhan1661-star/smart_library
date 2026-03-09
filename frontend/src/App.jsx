@@ -13,6 +13,7 @@ import Reservations from './pages/Reservations';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import PendingApproval from './pages/PendingApproval';
+import Settings from './pages/Settings';
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -80,6 +81,7 @@ function AppContent() {
                   <Link to="/members" className="hover:text-blue-200 transition">Members</Link>
                   <Link to="/issues" className="hover:text-blue-200 transition">Issues</Link>
                   <Link to="/fines" className="hover:text-blue-200 transition">Fines</Link>
+                  <Link to="/settings" className="hover:text-blue-200 transition flex items-center gap-1">⚙️ Settings</Link>
                 </>
               )}
 
@@ -123,6 +125,7 @@ function AppContent() {
           <Route path="/fines" element={<ProtectedRoute><Fines /></ProtectedRoute>} />
           <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
           <Route path="/recommendations" element={<ProtectedRoute><Recommendations /></ProtectedRoute>} />
+          <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
         </Routes>
       </main>
     </div>

@@ -30,6 +30,8 @@ export const issueAPI = {
 export const adminAPI = {
   getStats: () => api.get('/admin/stats'),
   getActivities: () => api.get('/admin/activities'),
+  getSettings: () => api.get('/admin/settings'),
+  updateSettings: (data) => api.put('/admin/settings', data),
 };
 
 export const reservationAPI = {

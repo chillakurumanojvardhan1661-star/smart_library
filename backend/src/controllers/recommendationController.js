@@ -7,7 +7,7 @@ import pool from '../config/db-adapter.js';
 export const getRecommendations = async (req, res) => {
   try {
     const { memberId } = req.params;
-    
+
     // Get member's borrowing history
     const historyResult = await pool.query(
       `SELECT DISTINCT b.category, b.author 
@@ -17,7 +17,7 @@ export const getRecommendations = async (req, res) => {
        LIMIT 10`,
       [memberId]
     );
-    
+
     if (historyResult.rows.length === 0) {
       // New user - recommend popular books
       const popularResult = await pool.query(
@@ -30,10 +30,10 @@ export const getRecommendations = async (req, res) => {
       );
       return res.json(popularResult.rows);
     }
-    
+
     const categories = [...new Set(historyResult.rows.map(r => r.category))];
     const authors = [...new Set(historyResult.rows.map(r => r.author))];
-    
+
     // Recommend books from same categories/authors not yet borrowed
     const recommendations = await pool.query(
       `SELECT DISTINCT b.*, 
@@ -51,7 +51,7 @@ export const getRecommendations = async (req, res) => {
        LIMIT 10`,
       [...authors, ...categories, memberId]
     );
-    
+
     res.json(recommendations.rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -60,16 +60,21 @@ export const getRecommendations = async (req, res) => {
 
 export const getTrendingBooks = async (req, res) => {
   try {
+    const pastDate = new Date();
+    pastDate.setDate(pastDate.getDate() - 30);
+    const dateStr = pastDate.toISOString().split('T')[0];
+
     const result = await pool.query(
       `SELECT b.*, COUNT(i.id) as issue_count
        FROM books b
        LEFT JOIN issues i ON b.id = i.book_id 
-         AND i.issue_date >= date('now', '-30 days')
+         AND i.issue_date >= $1
        GROUP BY b.id
        ORDER BY issue_count DESC
-       LIMIT 10`
+       LIMIT 10`,
+      [dateStr]
     );
-    
+
     res.json(result.rows);
   } catch (error) {
     res.status(500).json({ error: error.message });

@@ -19,4 +19,8 @@ router.put('/users/:id/status', adminController.updateUserStatus);
 router.put('/users/:id/role', adminController.updateUserRole);
 router.delete('/users/:id', adminController.deleteUser);
 
+// Settings
+router.get('/settings', adminController.getSettings);
+router.put('/settings', adminController.updateSettings);
+
 export default router;
