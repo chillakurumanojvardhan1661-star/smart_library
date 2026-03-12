@@ -70,23 +70,16 @@ export default function Login() {
 
       {/* Hero Content */}
       <div className="relative z-10 lg:mr-20 text-center lg:text-left mb-12 lg:mb-0 max-w-xl">
-        <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm font-medium mb-6 animate-bounce">
-          <span>✨ New 3D Library Experience</span>
-        </div>
         <h1 className="text-5xl lg:text-7xl font-extrabold text-white mb-6 leading-tight tracking-tight">
-          Smaert <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">Library</span> Management
+          VIT-AP <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">University</span> Central Library
         </h1>
         <p className="text-lg text-slate-300 mb-8 leading-relaxed">
-          Experience the future of knowledge management with our 3D-enhanced library portal. Access thousands of resources, track your issues, and explore recommendations in a seamless environment.
+          Experience the future of knowledge management with our library portal. Access thousands of resources, track your issues, and explore recommendations in a seamless environment.
         </p>
         <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
           <div className="px-6 py-3 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm text-white font-medium flex items-center space-x-2">
             <span className="w-2 h-2 bg-green-500 rounded-full"></span>
             <span>24/7 Access</span>
-          </div>
-          <div className="px-6 py-3 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm text-white font-medium flex items-center space-x-2">
-            <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-            <span>3D Visualizer</span>
           </div>
         </div>
       </div>
@@ -150,10 +143,12 @@ export default function Login() {
               <span className="text-sm text-slate-500">Quick access for testing</span>
             </div>
             
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
               {[
-                { role: 'Admin', icon: '👨‍💼', email: 'admin@library.com', pass: 'admin123', color: 'red' },
-                { role: 'Student', icon: '🎓', email: 'student@library.com', pass: 'student123', color: 'blue' },
+                { role: 'Admin', icon: '👨‍💼', email: 'admin@library.com', pass: 'admin123' },
+                { role: 'Faculty', icon: '👨‍🏫', email: 'faculty@library.com', pass: 'faculty123' },
+                { role: 'Student', icon: '🎓', email: 'student@library.com', pass: 'student123' },
+                { role: 'Staff', icon: '👥', email: 'staff@library.com', pass: 'staff123' },
               ].map((demo) => (
                 <button
                   key={demo.role}
@@ -162,10 +157,10 @@ export default function Login() {
                     setEmail(demo.email);
                     setPassword(demo.pass);
                   }}
-                  className="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/20 transition-all duration-300 group"
+                  className="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/20 transition-all duration-200 group"
                 >
                   <span className="text-2xl mb-1 filter grayscale group-hover:grayscale-0 transition-all">{demo.icon}</span>
-                  <span className="text-xs font-semibold text-slate-400 group-hover:text-white transition-colors">{demo.role}</span>
+                  <span className="text-[10px] font-semibold text-slate-400 group-hover:text-white transition-colors">{demo.role}</span>
                 </button>
               ))}
             </div>
