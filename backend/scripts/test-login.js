@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const LIVE_API = 'https://backend-nine-nu-46.vercel.app/api';
+const LIVE_API = 'https://frontend-4sm1uo7z1-manojs-projects-5f211bbe.vercel.app/api';
 
 async function testLogin() {
     console.log(`Testing Login to ${LIVE_API}...`);

@@ -53,8 +53,13 @@ app.get('/health', (req, res) => {
   res.json({ status: 'OK', message: 'VIT-AP University Central Library API' });
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📊 Database: ${process.env.USE_SQLITE === 'true' ? 'SQLite' : 'PostgreSQL'}`);
-  console.log(`✨ Features: Auth, Recommendations, Analytics, Export, Fine Management`);
-});
+// For local development
+if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`📊 Database: ${process.env.USE_SQLITE === 'true' ? 'SQLite' : 'PostgreSQL'}`);
+    console.log(`✨ Features: Auth, Recommendations, Analytics, Export, Fine Management`);
+  });
+}
+
+export default app;
