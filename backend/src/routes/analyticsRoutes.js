@@ -11,7 +11,7 @@ router.use(authenticateToken);
 // Admin and faculty can view analytics
 router.get('/issues-trend', requireRole('admin', 'faculty'), analyticsController.getIssuesTrend);
 router.get('/category-distribution', requireRole('admin', 'faculty'), analyticsController.getCategoryDistribution);
-router.get('/top-borrowers', requireRole('admin'), analyticsController.getTopBorrowers);
-router.get('/fines', requireRole('admin'), analyticsController.getFineAnalytics);
+router.get('/top-borrowers', requireRole('admin', 'faculty'), analyticsController.getTopBorrowers);
+router.get('/fines', requireRole('admin', 'faculty'), analyticsController.getFineAnalytics);
 
 export default router;
