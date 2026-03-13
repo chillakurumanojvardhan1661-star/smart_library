@@ -9,7 +9,7 @@ export const getIssuesTrend = async (req, res) => {
     const dateStr = pastDate.toISOString().split('T')[0];
 
     const result = await pool.query(
-      `SELECT CAST(issue_date AS DATE) as date, COUNT(*) as count
+      `SELECT CAST(issue_date AS DATE) as date, CAST(COUNT(*) AS INTEGER) as count
        FROM issues
        WHERE issue_date >= $1
        GROUP BY CAST(issue_date AS DATE)
@@ -26,7 +26,7 @@ export const getIssuesTrend = async (req, res) => {
 export const getCategoryDistribution = async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT category, COUNT(*) as count
+      `SELECT category, CAST(COUNT(*) AS INTEGER) as count
        FROM books
        GROUP BY category
        ORDER BY count DESC`
@@ -41,7 +41,7 @@ export const getCategoryDistribution = async (req, res) => {
 export const getTopBorrowers = async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT u.username as name, u.id as member_id, COUNT(i.id) as borrow_count
+      `SELECT u.username as name, u.id as member_id, CAST(COUNT(i.id) AS INTEGER) as borrow_count
        FROM users u
        LEFT JOIN issues i ON u.id = i.user_id
        WHERE u.role != 'admin'
@@ -60,7 +60,7 @@ export const getFineAnalytics = async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT 
-        COUNT(*) as total_fines,
+        CAST(COUNT(*) AS INTEGER) as total_fines,
         SUM(fine_amount) as total_amount,
         AVG(fine_amount) as avg_fine,
         MAX(fine_amount) as max_fine
