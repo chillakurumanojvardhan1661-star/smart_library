@@ -92,15 +92,18 @@ export default function Analytics() {
       </div>
 
       <div className="bg-white p-6 rounded-lg shadow">
-        <h3 className="text-xl font-semibold mb-4">Top Borrowers</h3>
+        <h3 className="text-xl font-semibold mb-4">Books Issued by Role</h3>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={topBorrowers}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
+            <XAxis 
+              dataKey="name" 
+              tickFormatter={(role) => role.charAt(0).toUpperCase() + role.slice(1)}
+            />
             <YAxis />
             <Tooltip />
             <Legend />
-            <Bar dataKey="borrow_count" fill="#3B82F6" />
+            <Bar dataKey="issue_count" name="Books Issued" fill="#3B82F6" />
           </BarChart>
         </ResponsiveContainer>
       </div>
