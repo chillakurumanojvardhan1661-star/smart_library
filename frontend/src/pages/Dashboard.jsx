@@ -9,7 +9,7 @@ export default function Dashboard() {
   const { data: stats, isLoading } = useQuery({
     queryKey: ['stats'],
     queryFn: () => adminAPI.getStats().then(res => res.data),
-    enabled: user?.role === 'admin',
+    enabled: user?.role === 'admin' || user?.role === 'faculty',
   });
 
   const handleExport = (type) => {
@@ -19,7 +19,7 @@ export default function Dashboard() {
     window.open(`${cleanBaseUrl}/api/export/${type}?format=csv`, '_blank');
   };
 
-  if (isLoading && user?.role === 'admin') {
+  if (isLoading && (user?.role === 'admin' || user?.role === 'faculty')) {
     return <div className="flex justify-center items-center h-64">Loading...</div>;
   }
 
@@ -58,7 +58,8 @@ export default function Dashboard() {
         )}
       </div>
 
-      {user?.role === 'admin' && stats && (
+      {/* Statistics Section for Admin and Faculty */}
+      {(user?.role === 'admin' || user?.role === 'faculty') && stats && (
         <>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <StatCard title="Total Books" value={stats?.total_books || 0} icon="📚" color="blue" />

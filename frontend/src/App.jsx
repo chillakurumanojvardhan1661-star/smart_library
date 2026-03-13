@@ -90,11 +90,14 @@ function AppContent() {
                 {user.role === 'admin' && (
                   <>
                     <Link to="/users" className="text-sm font-medium hover:text-blue-400 transition-colors">Users</Link>
-                    <Link to="/members" className="text-sm font-medium hover:text-blue-400 transition-colors">Members</Link>
                     <Link to="/issues" className="text-sm font-medium hover:text-blue-400 transition-colors">Issues</Link>
                     <Link to="/fines" className="text-sm font-medium hover:text-blue-400 transition-colors">Fines</Link>
                     <Link to="/settings" className="text-sm font-medium hover:text-blue-400 transition-colors flex items-center gap-1">⚙️ Settings</Link>
                   </>
+                )}
+                
+                {(user.role === 'admin' || user.role === 'faculty') && (
+                  <Link to="/members" className="text-sm font-medium hover:text-blue-400 transition-colors">Members</Link>
                 )}
 
                 {user.role !== 'admin' && (
