@@ -34,8 +34,8 @@ function AppContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-slate-950">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
       </div>
     );
   }
@@ -62,49 +62,60 @@ function AppContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg">
+    <div className="min-h-screen relative overflow-hidden bg-slate-950 selection:bg-blue-500/30">
+      {/* Global Background Image with Deep Overlay */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <img 
+          src="/library_bg.png" 
+          alt="Library Background" 
+          className="w-full h-full object-cover opacity-20"
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-950/80 to-blue-900/30"></div>
+      </div>
+
+      <nav className="relative z-10 bg-slate-900/40 backdrop-blur-xl border-b border-white/10 text-white shadow-2xl">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold">📚 VIT-AP University Central Library</h1>
-            <div className="flex gap-6 items-center">
-              <Link to="/" className="hover:text-blue-200 transition">Dashboard</Link>
-              <Link to="/books" className="hover:text-blue-200 transition">Books</Link>
-              <Link to="/reservations" className="hover:text-blue-200 transition">
+            <h1 className="text-xl lg:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
+              📚 VIT-AP University Central Library
+            </h1>
+            <div className="flex gap-4 lg:gap-6 items-center">
+              <Link to="/" className="text-sm font-medium hover:text-blue-400 transition-colors">Dashboard</Link>
+              <Link to="/books" className="text-sm font-medium hover:text-blue-400 transition-colors">Books</Link>
+              <Link to="/reservations" className="text-sm font-medium hover:text-blue-400 transition-colors">
                 {user.role === 'admin' ? 'Reservations' : 'My Reservations'}
               </Link>
 
-              {/* Admin-only navigation */}
-              {user.role === 'admin' && (
-                <>
-                  <Link to="/users" className="hover:text-blue-200 transition">Users</Link>
-                  <Link to="/members" className="hover:text-blue-200 transition">Members</Link>
-                  <Link to="/issues" className="hover:text-blue-200 transition">Issues</Link>
-                  <Link to="/fines" className="hover:text-blue-200 transition">Fines</Link>
-                  <Link to="/settings" className="hover:text-blue-200 transition flex items-center gap-1">⚙️ Settings</Link>
-                </>
-              )}
+              <div className="hidden lg:flex gap-6 items-center">
+                {user.role === 'admin' && (
+                  <>
+                    <Link to="/users" className="text-sm font-medium hover:text-blue-400 transition-colors">Users</Link>
+                    <Link to="/members" className="text-sm font-medium hover:text-blue-400 transition-colors">Members</Link>
+                    <Link to="/issues" className="text-sm font-medium hover:text-blue-400 transition-colors">Issues</Link>
+                    <Link to="/fines" className="text-sm font-medium hover:text-blue-400 transition-colors">Fines</Link>
+                    <Link to="/settings" className="text-sm font-medium hover:text-blue-400 transition-colors flex items-center gap-1">⚙️ Settings</Link>
+                  </>
+                )}
 
-              {/* Non-admin users can see their fine balance */}
-              {user.role !== 'admin' && (
-                <Link to="/fines" className="hover:text-blue-200 transition">My Fines</Link>
-              )}
+                {user.role !== 'admin' && (
+                  <Link to="/fines" className="text-sm font-medium hover:text-blue-400 transition-colors">My Fines</Link>
+                )}
 
-              <Link to="/recommendations" className="hover:text-blue-200 transition">Recommendations</Link>
+                <Link to="/recommendations" className="text-sm font-medium hover:text-blue-400 transition-colors">Recommendations</Link>
 
-              {/* Analytics for admin and faculty */}
-              {(user.role === 'admin' || user.role === 'faculty') && (
-                <Link to="/analytics" className="hover:text-blue-200 transition">Analytics</Link>
-              )}
+                {(user.role === 'admin' || user.role === 'faculty') && (
+                  <Link to="/analytics" className="text-sm font-medium hover:text-blue-400 transition-colors">Analytics</Link>
+                )}
+              </div>
 
-              <div className="flex items-center gap-3 ml-4 pl-4 border-l border-white/30">
-                <div className="text-sm">
-                  <div className="font-semibold">{user.username}</div>
-                  <div className="text-xs text-blue-100 capitalize">{user.role}</div>
+              <div className="flex items-center gap-3 ml-2 lg:ml-4 pl-4 border-l border-white/20">
+                <div className="hidden sm:block text-right">
+                  <div className="text-xs font-bold text-white">{user.username}</div>
+                  <div className="text-[10px] text-blue-400 uppercase tracking-wider font-semibold">{user.role}</div>
                 </div>
                 <button
                   onClick={logout}
-                  className="bg-white/20 hover:bg-white/30 px-3 py-1 rounded transition"
+                  className="bg-red-500/20 hover:bg-red-500/40 text-red-500 px-3 py-1.5 rounded-lg text-xs font-bold transition-all border border-red-500/20"
                 >
                   Logout
                 </button>
@@ -114,19 +125,21 @@ function AppContent() {
         </div>
       </nav>
 
-      <main className="container mx-auto px-4 py-8">
-        <Routes>
-          <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/books" element={<ProtectedRoute><Books /></ProtectedRoute>} />
-          <Route path="/reservations" element={<ProtectedRoute><Reservations /></ProtectedRoute>} />
-          <Route path="/users" element={<ProtectedRoute><Users /></ProtectedRoute>} />
-          <Route path="/members" element={<ProtectedRoute><Members /></ProtectedRoute>} />
-          <Route path="/issues" element={<ProtectedRoute><Issues /></ProtectedRoute>} />
-          <Route path="/fines" element={<ProtectedRoute><Fines /></ProtectedRoute>} />
-          <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
-          <Route path="/recommendations" element={<ProtectedRoute><Recommendations /></ProtectedRoute>} />
-          <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-        </Routes>
+      <main className="relative z-10 container mx-auto px-4 py-8 overflow-y-auto">
+        <div className="glass-morphism rounded-3xl p-1 bg-white/[0.02] border border-white/5 shadow-inner">
+          <Routes>
+            <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/books" element={<ProtectedRoute><Books /></ProtectedRoute>} />
+            <Route path="/reservations" element={<ProtectedRoute><Reservations /></ProtectedRoute>} />
+            <Route path="/users" element={<ProtectedRoute><Users /></ProtectedRoute>} />
+            <Route path="/members" element={<ProtectedRoute><Members /></ProtectedRoute>} />
+            <Route path="/issues" element={<ProtectedRoute><Issues /></ProtectedRoute>} />
+            <Route path="/fines" element={<ProtectedRoute><Fines /></ProtectedRoute>} />
+            <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+            <Route path="/recommendations" element={<ProtectedRoute><Recommendations /></ProtectedRoute>} />
+            <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+          </Routes>
+        </div>
       </main>
     </div>
   );
